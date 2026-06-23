@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from controllers import cinema_bp
+from controllers import cinema_bp, dashboard_bp
 from dados_iniciais import popular_dados
 from models import db
 
@@ -21,6 +21,7 @@ def criar_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    app.register_blueprint(dashboard_bp)
     app.register_blueprint(cinema_bp)
 
     with app.app_context():
