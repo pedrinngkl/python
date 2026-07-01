@@ -17,7 +17,7 @@
 **Identificação**
 
 - Nome: Pedro Gonçalves
-- Turma: 3° Ano
+- Turma: 3C2
 
 ---
 
