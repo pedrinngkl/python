@@ -1,5 +1,5 @@
 # =============================================================================
-# Service — integração com https://ge.globo.com/
+# Service — integração com https://www.espn.com.br/futebol/
 # =============================================================================
 #
 # ---------------------------------------------------------------------------
@@ -9,11 +9,11 @@
 #   Framework da API (Blueprint, jsonify). Usado em app.py e controllers/.
 #
 # requests
-#   Cliente HTTP — faz o GET no site do GE e traz o HTML (como na Aula 9).
+#   Cliente HTTP — faz o GET no site da ESPN e traz o HTML (como na Aula 9).
 #   Objeto importante: requests.Response ( .text, .status_code, .raise_for_status() )
 #
 # beautifulsoup4  (import: from bs4 import BeautifulSoup)
-#   Lê HTML “bagunçado” e vira árvore de tags para buscar <a>, <h2>, etc.
+#   Lê HTML "bagunçado" e vira árvore de tags para buscar <a>, <h2>, etc.
 #   O parser "html.parser" vem com o Python; o pacote é o BeautifulSoup.
 #
 # Biblioteca PADRÃO do Python (não precisa pip install):
@@ -34,19 +34,19 @@
 #   mencoes: list[dict]                lista de dicionários
 #   -> ResultadoBusca                  TypedDict — dict com chaves conhecidas
 #
-# str | None  significa “str ou None” (equivalente antigo: Optional[str]).
+# str | None  significa "str ou None" (equivalente antigo: Optional[str]).
 #
 # ---------------------------------------------------------------------------
-# O que é re.Pattern 
+# O que é re.Pattern
 # ---------------------------------------------------------------------------
-# re.compile(r"sele[cç][aã]o") NÃO devolve string — devolve um Pattern:
+# re.compile(r"brasileir[aã]o") NÃO devolve string — devolve um Pattern:
 #   um objeto regex JÁ COMPILADO, pronto para .search(texto), .match(...), etc.
 #
 # Por que compilar antes do loop?
 #   Compilar uma vez e reutilizar em milhares de títulos é mais rápido
 #   do que recompilar a expressão a cada linha.
 #
-# re.Pattern[str] no type hint = “Pattern que trabalha com str” (Python 3.9+).
+# re.Pattern[str] no type hint = "Pattern que trabalha com str" (Python 3.9+).
 # =============================================================================
 
 from __future__ import annotations
@@ -58,8 +58,8 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-# Página inicial do portal — o conteúdo muda ao longo do dia (notícias ao vivo).
-URL_GE: str = "https://www.espn.com.br/futebol/selecao-brasileira/artigo/_/id/17058650/ancelotti-revela-qual-erro-brasil-perdemos-copa-pausa-hidratacao-contra-noruega"
+# Página de futebol da ESPN Brasil — o conteúdo muda ao longo do dia (notícias ao vivo).
+URL_ESPN: str = "https://www.espn.com.br/futebol/"
 
 # Evita travar para sempre se o site não responder.
 TIMEOUT: int = 15
@@ -67,12 +67,12 @@ TIMEOUT: int = 15
 # Alguns sites bloqueiam User-Agent vazio; identificamos o cliente educacional.
 USER_AGENT: str = "Mozilla/5.0 (compatible; TecTI-Aula16/1.0; +aula-educacional)"
 
-# Expressões regulares para achar "seleção" OU "selecao" (ç/c e ã/a).
+# Expressões regulares para achar "Brasileirão" OU "brasileirao" (ã/a).
 # re.compile → re.Pattern[str]  (objeto regex, não string).
-REGEX_SUBSTRING: re.Pattern[str] = re.compile(r"sele[cç][aã]o", re.IGNORECASE)
+REGEX_SUBSTRING: re.Pattern[str] = re.compile(r"brasileir[aã]o", re.IGNORECASE)
 
 # \b = limite de palavra — evita casar pedaços estranhos em palavras longas.
-REGEX_PALAVRA: re.Pattern[str] = re.compile(r"\bsele[cç][aã]o\b", re.IGNORECASE)
+REGEX_PALAVRA: re.Pattern[str] = re.compile(r"\bbrasileir[aã]o\b", re.IGNORECASE)
 
 
 class Mencao(TypedDict):
@@ -85,7 +85,7 @@ class Mencao(TypedDict):
 
 
 class ResultadoBusca(TypedDict):
-    """Formato completo retornado por buscar_mencoes_selecao()."""
+    """Formato completo retornado por buscar_mencoes_brasileirao()."""
 
     fonte: str
     termo_busca: str
@@ -107,7 +107,7 @@ def _trecho_com_destaque(
     janela: int = 60,
 ) -> str:
     """
-    Recorta um pedaço do texto em torno da primeira ocorrência de 'seleção'.
+    Recorta um pedaço do texto em torno da primeira ocorrência de 'Brasileirão'.
     padrao.search(texto) usa o Pattern compilado — retorna Match ou None.
     """
     match = padrao.search(texto)
@@ -125,25 +125,25 @@ def _trecho_com_destaque(
     return trecho
 
 
-def buscar_mencoes_selecao(modo: str = "substring") -> ResultadoBusca:
+def buscar_mencoes_brasileirao(modo: str = "substring") -> ResultadoBusca:
     """
     Função principal do Service — chamada pelo Controller.
 
     modo:
-      - "substring": qualquer texto que contenha seleção/selecao
-      - "palavra": só quando 'seleção' aparece como palavra isolada
+      - "substring": qualquer texto que contenha brasileirão/brasileirao
+      - "palavra": só quando 'brasileirão' aparece como palavra isolada
     """
     padrao: re.Pattern[str] = _padrao_busca(modo)
 
     try:
         resposta: requests.Response = requests.get(
-            URL_GE,
+            URL_ESPN,
             timeout=TIMEOUT,
             headers={"User-Agent": USER_AGENT},
         )
         resposta.raise_for_status()
     except requests.RequestException as erro:
-        raise ConnectionError(f"Não foi possível acessar o GE: {erro}") from erro
+        raise ConnectionError(f"Não foi possível acessar a ESPN: {erro}") from erro
 
     resposta.encoding = resposta.apparent_encoding or "utf-8"
 
@@ -162,7 +162,7 @@ def buscar_mencoes_selecao(modo: str = "substring") -> ResultadoBusca:
 
         url: str | None = None
         if tag.name == "a" and tag.get("href"):
-            url = urljoin(URL_GE, tag["href"])
+            url = urljoin(URL_ESPN, tag["href"])
 
         chave = (texto[:200], url)
         if chave in vistos:
@@ -179,8 +179,8 @@ def buscar_mencoes_selecao(modo: str = "substring") -> ResultadoBusca:
         )
 
     return ResultadoBusca(
-        fonte=URL_GE,
-        termo_busca="seleção",
+        fonte=URL_ESPN,
+        termo_busca="Brasileirão",
         modo_busca=modo,
         total=len(mencoes),
         mencoes=mencoes,

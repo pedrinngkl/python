@@ -3,7 +3,7 @@
 # =============================================================================
 # Responsabilidade:
 #   • Ler parâmetros da URL (request.args)
-#   • Chamar o Service (buscar_mencoes_selecao)
+#   • Chamar o Service (buscar_mencoes_brasileirao)
 #   • Devolver JSON com jsonify e códigos HTTP corretos (200, 400, 502)
 # O Controller NÃO faz requests nem parse de HTML — isso é do Service.
 #
@@ -18,7 +18,7 @@ from typing import Any
 
 from flask import Blueprint, jsonify, request
 
-from services import buscar_mencoes_selecao
+from services import buscar_mencoes_brasileirao
 
 # Blueprint com prefixo /api → rota "/selecao" vira GET /api/selecao
 selecao_api_bp = Blueprint("selecao_api", __name__, url_prefix="/api")
@@ -42,7 +42,7 @@ def listar_mencoes_selecao() -> Any:
 
     try:
         # dados é dict conforme ResultadoBusca no Service (type hint lá).
-        dados = buscar_mencoes_selecao(modo=modo)
+        dados = buscar_mencoes_brasileirao(modo=modo)
     except ConnectionError as erro:
         # 502 Bad Gateway — nossa API está no ar, mas a fonte externa falhou.
         return jsonify({"erro": str(erro)}), 502

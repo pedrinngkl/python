@@ -2,7 +2,7 @@
 # Aula 16 — ponto de entrada da aplicação Flask
 # =============================================================================
 # Diferente da Aula 15: aqui NÃO há banco SQLite. Os dados vêm de um site
-# externo (GE Globo) no momento da requisição — o Service faz o download.
+# externo (ESPN Brasil) no momento da requisição — o Service faz o download.
 # Resposta sempre JSON (jsonify), sem render_template.
 #
 # TYPE HINT (revisão):
@@ -20,7 +20,7 @@ ENDPOINTS: list[dict[str, str]] = [
     {
         "metodo": "GET",
         "rota": "/api/selecao",
-        "descricao": "Lista textos do GE que citam seleção (busca ao vivo no site)",
+        "descricao": "Lista textos da ESPN que citam Brasileirão (busca ao vivo no site)",
         "query": "?modo=substring (padrão) ou ?modo=palavra",
     },
 ]
@@ -32,7 +32,7 @@ def criar_app() -> Flask:
 
     # SECRET_KEY é obrigatória no Flask; nesta API simples quase não usamos sessão,
     # mas o framework exige a configuração.
-    app.config["SECRET_KEY"] = "aula16-ge-globo-dev"
+    app.config["SECRET_KEY"] = "aula16-espn-brasileirao-dev"
 
     # Registra o Blueprint das rotas /api/... (arquivo controllers/selecao_api.py).
     app.register_blueprint(selecao_api_bp)
@@ -42,8 +42,8 @@ def criar_app() -> Flask:
         # Rota de ajuda — também é JSON, não é página HTML.
         return jsonify(
             {
-                "aula": "16 — API + site externo (GE Globo)",
-                "fonte": "https://ge.globo.com/",
+                "aula": "16 — API + site externo (ESPN Brasil)",
+                "fonte": "https://www.espn.com.br/futebol/",
                 "mensagem": "Use GET /api/selecao no Postman ou navegador.",
                 "endpoints": ENDPOINTS,
             }
