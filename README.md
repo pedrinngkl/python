@@ -41,6 +41,7 @@ python/
 ├── 📁 atividade_avaliativa/      # 🎬 Sistema de Cinema — Atividade Avaliativa
 ├── 📁 revisao1/                  # ⚽ Sistema de Jogadores — Revisão
 ├── 📁 Aula15-API/                # 📚 API REST de Livros (JSON / Postman)
+├── 📁 Aula16/                    # ⚽ Web Scraping ESPN — Brasileirão
 │
 └── 📄 .gitignore
 ```
@@ -81,6 +82,7 @@ python/
 | `atividade_avaliativa/` | **Sistema de Cinema** — Filmes, Salas, Sessões e Ingressos | MVC completo, relacionamentos, dashboard |
 | `revisao1/` | **Sistema de Jogadores** — CRUD completo | MVC, dados iniciais, dashboard |
 | `Aula15-API/` | **API REST de Livros** — Endpoints JSON | API RESTful, `jsonify`, Postman |
+| `Aula16/` | **Web Scraping ESPN** — Busca menções de Brasileirão | `requests`, `BeautifulSoup`, regex, API + scraping |
 
 ---
 
